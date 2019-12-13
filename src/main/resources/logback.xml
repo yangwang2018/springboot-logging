@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+	<property scope="system" name="APP_NAME" value="springboot-logging" />
+	<property scope="system" name="APP_ENV" value="development" />
+	<property scope="system" name="LOG_DIR" value="/home/springboot-logging/logs" />
+
+	<!-- 日志写入文件系统 -->
+	<appender name="ROLLING"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 默认输出INFO级别 -->
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+
+		<!--file设定最新的日志名称始终为${APP_NAME}.log-->
+		<file>${LOG_DIR}/${APP_NAME}.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!--fileNamePattern设定日志切割的策略，当达到策略设定的时间，则过期的日志名称将按设定的策略进行变更
+			%d{yyyy-MM-dd}.%i.log  按天切割
+			%d{yyyy-MM-dd.HH}.%i.log  按小时切割
+			%d{yyyy-MM-dd.HH.mm}.%i.log  按分钟切割-->
+			<fileNamePattern>${LOG_DIR}/${APP_NAME}-%d{yyyy-MM-dd}.%i.log
+			</fileNamePattern>
+			<!--设定日志的存储时间为15天-->
+			<maxHistory>15</maxHistory>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<!-- 每个日志文件大小不超过2GB -->
+				<maxFileSize>2000MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+		<!-- 日志内容的输出格式 -->
+		<encoder>
+			<pattern>%d{yyyy/MM/dd HH:mm:ss.SSS}[%X{product}|%X{module}|%X{node}|%X{process}|%X{uuid}][%p] %c{3}.%M[%L]-%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- console输出 -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+		<encoder>
+ 			<pattern>%d{yyyy/MM/dd HH:mm:ss.SSS}[%X{product}|%X{module}|%X{node}|%X{process}|%X{uuid}][%p] %c{3}.%M[%L]-%m%n</pattern>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="ROLLING" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+
+	<!-- 对于一些特定的包进行默认日志级别设定 -->
+	<logger name="org.apache.*" level="WARN" />
+
+</configuration>
